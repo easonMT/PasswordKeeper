@@ -1,4 +1,4 @@
-package com.usermodel;
+package com.usermodel.controller;
 
 
 import java.util.Optional;
@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 // import org.springframework.web.bind.annotation.CrossOrigin;
+
+import com.usermodel.model.UserModel;
+import com.usermodel.repository.UserRepository;
 
 // @CrossOrigin(origins = "*")
 @RestController

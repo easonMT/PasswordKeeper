@@ -4,6 +4,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.usermodel.model.UserModel;
+import com.usermodel.repository.UserRepository;
+
 @Configuration
 public class LoadDatabase {
     

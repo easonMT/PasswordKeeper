@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.usermodel.service.UserService;
 // import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.usermodel.model.UserModel;
@@ -26,6 +27,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllUsers() {
@@ -71,6 +75,39 @@ public class UserController {
             return new ResponseEntity<>("User with ID: " + id + " was not found.", HttpStatus.NOT_FOUND);
         }
     }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody UserModel newUserModel) {
+        if(userRepository.existsByEmail(newUserModel.getEmail())) {
+            return new ResponseEntity<>("Email is already registered.", HttpStatus.BAD_REQUEST);
+        }
+
+        String hashedPassword = userService.hashPassword(newUserModel.getPassword());
+        newUserModel.setHashedPassword(hashedPassword);
+
+        userRepository.save(newUserModel);
+        return new ResponseEntity<>(newUserModel, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody UserModel loginRequest) {
+        Optional<UserModel> userOptional = userRepository.findByEmail(loginRequest.getEmail());
+        
+        if (userOptional.isPresent()) {
+            UserModel user = userOptional.get();
+    
+            // Check if the provided password matches the hashed password in the database
+            if (userService.verifyPassword(loginRequest.getPassword(), user.getHashedPassword())) {
+                return new ResponseEntity<>("Login successful.", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Incorrect password.", HttpStatus.UNAUTHORIZED);
+            }
+        } else {
+            return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    
     
 
 }

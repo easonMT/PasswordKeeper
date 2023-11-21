@@ -15,10 +15,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.usermodel.service.UserService;
+
 // import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.usermodel.model.UserModel;
 import com.usermodel.repository.UserRepository;
+import com.usermodel.model.PasswordModel;
+import com.usermodel.repository.PasswordRepository;
 
 // @CrossOrigin(origins = "*")
 @RestController
@@ -30,6 +33,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PasswordRepository passwordRepository;
 
     @GetMapping("/all")
     public ResponseEntity<?> getAllUsers() {
@@ -104,6 +110,46 @@ public class UserController {
             }
         } else {
             return new ResponseEntity<>("User not found.", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("password/new")
+    public ResponseEntity<?> addNewPassword(@PathVariable long userId, @RequestBody PasswordModel newPassword) {
+        Optional<UserModel> userOptional = userRepository.findById(userId);
+
+        if (userOptional.isPresent()) {
+            UserModel user = userOptional.get();
+            newPassword.setUser(user);
+
+            passwordRepository.save(newPassword);
+            return new ResponseEntity<>(newPassword, HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>("User with ID: " + userId + " not found.", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/password/update/{passwordId}")
+    public ResponseEntity<?> updatePassword(@PathVariable long passwordId, @RequestBody PasswordModel updatedPassword) {
+        Optional<PasswordModel> passwordOptional = passwordRepository.findById(passwordId);
+
+        if (passwordOptional.isPresent()) {
+            PasswordModel password = passwordOptional.get();
+            password.setPassword(updatedPassword.getPassword());
+
+            passwordRepository.save(password);
+            return new ResponseEntity<>(password, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Password with ID: " + passwordId + " not found.", HttpStatus.NOT_FOUND);
+        }
+}
+
+    @DeleteMapping("/password/delete/{passwordId}")
+    public ResponseEntity<String> deletePassword(@PathVariable long passwordId) {
+        if (passwordRepository.existsById(passwordId)) {
+            passwordRepository.deleteById(passwordId);
+            return new ResponseEntity<>("Password successfully deleted.", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Password with ID: " + passwordId + " was not found.", HttpStatus.NOT_FOUND);
         }
     }
 

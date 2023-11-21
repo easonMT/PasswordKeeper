@@ -3,7 +3,9 @@ package com.usermodel.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 
 @Entity
 @Table(name = "UserModel")
@@ -18,6 +20,8 @@ public class UserModel {
     private String password;
     private String email;
     private String hashedPassword;
+    @OneToMany(mappedBy = "user")
+    private List<PasswordModel> passwords;
 
     public UserModel() {
 
@@ -77,6 +81,14 @@ public class UserModel {
 
     public void setHashedPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
+    }
+
+    public List<PasswordModel> getPasswords() {
+        return passwords;
+    }
+
+    public void setPasswords(List<PasswordModel> passwords) {
+        this.passwords = passwords;
     }
 
     
